@@ -68,7 +68,7 @@ def scrape():
 def keep_alive():
     while True:
         try:
-            requests.get('https://your-app-url.onrender.com/scrape')
+            requests.get('https://mcscraper.onrender.com/scrape')
         except requests.exceptions.RequestException as e:
             print(f"Keep-alive request failed: {e}")
         time.sleep(60 * 15)  # Keep alive every 15 minutes
