@@ -44,7 +44,26 @@ def is_minecraft_key(text):
     key_pattern = re.compile(r'[A-Z0-9]{5}-[A-Z0-9]{5}-[A-Z0-9]{5}-[A-Z0-9]{5}-[A-Z0-9]{5}')  # Adjust the pattern as needed
     return bool(key_pattern.match(text))
 
-def scrape_keys(url):
+def scrape_reddit(subreddit, num_pages=5):
+    keys = []
+    for page in range(1, num_pages + 1):
+        url = f"https://www.reddit.com/r/{subreddit}/?count={page*25}&after=t3_{page*25}"
+        response = requests.get(url)
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        # Find all post links on the page
+        for link in soup.find_all('a', class_='_eYtD2XCVieq6emjKBH3m'):
+            post_url = 'https://www.reddit.com' + link['href']
+            post_response = requests.get(post_url)
+            post_soup = BeautifulSoup(post_response.content, 'html.parser')
+
+            # Extract text from the post
+            post_text = post_soup.find('div', class_='_eYtD2XCVieq6emjKBH3m').get_text(strip=True)
+            if post_text and is_minecraft_key(post_text):
+                keys.append(post_text)
+    return keys
+
+def scrape_forum(url):
     response = requests.get(url)
     soup = BeautifulSoup(response.content, 'html.parser')
     keys = []
@@ -56,6 +75,13 @@ def scrape_keys(url):
             keys.append(key)
 
     return keys
+
+def scrape_keys(url):
+    if 'reddit.com' in url:
+        subreddit = url.split('/r/')[1].split('/')[0]
+        return scrape_reddit(subreddit)
+    else:
+        return scrape_forum(url)
 
 @app.route('/scrape', methods=['GET'])
 def scrape():
