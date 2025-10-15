@@ -312,6 +312,10 @@ def scrape():
         # Cache results
         cache.set(cache_key, unique_keys)
 
+        # Print scraped keys to the console
+        for key in unique_keys:
+            logger.info(f"Scraped Key: {key['key']} from {key['source']}")
+
         logger.info(f"Scraping completed. Found {len(unique_keys)} unique keys")
 
         return jsonify({
