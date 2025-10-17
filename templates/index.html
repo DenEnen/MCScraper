@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Keys Scraper</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .refresh { margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Found Game Keys</h1>
+    <p>Refresh the page to see new keys. Showing latest keys from the last few hours of scraping.</p>
+    <button class="refresh" onclick="location.reload();">Refresh</button>
+    <table>
+        <thead>
+            <tr>
+                <th>Key</th>
+                <th>Source Type</th>
+                <th>Source URL</th>
+                <th>Context</th>
+                <th>Found At</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for key in keys %}
+            <tr>
+                <td>{{ key.key }}</td>
+                <td>{{ key.source_type }}</td>
+                <td><a href="{{ key.source_url }}" target="_blank">{{ key.source_url }}</a></td>
+                <td>{{ key.context }}</td>
+                <td>{{ key.found_at }}</td>
+            </tr>
+            {% endfor %}
+            {% if not keys %}
+            <tr><td colspan="5">No keys found yet. Scraping in progress...</td></tr>
+            {% endif %}
+        </tbody>
+    </table>
+</body>
+</html>

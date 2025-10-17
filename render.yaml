@@ -1,0 +1,39 @@
+services:
+  - type: web
+    name: game-keys-scraper
+    env: python
+    plan: free  # Or starter for no sleep
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "uvicorn src.main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11
+  - type: redis
+    name: redis
+    ipAllowList: [] # only allow internal connections
+  - type: worker
+    name: celery-worker
+    env: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "celery -A src.tasks.celery_app worker --loglevel=info"
+    envVars:
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: redis
+          property: connectionString
+      - key: PYTHON_VERSION
+        value: 3.11
+  - type: worker
+    name: celery-beat
+    env: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "celery -A src.tasks.celery_app beat --loglevel=info"
+    envVars:
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: redis
+          property: connectionString
+      - key: PYTHON_VERSION
+        value: 3.11
